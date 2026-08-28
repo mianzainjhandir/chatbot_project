@@ -29,9 +29,18 @@ class ChatProvider with ChangeNotifier {
       );
       _messages.add(assistantMessage);
     } catch (e) {
-      // Add error message as assistant for UI feedback
+      String errorMessage = "Something went wrong. Please try again.";
+      
+      if (e.toString().contains("insufficient_quota")) {
+        errorMessage = "⚠️ OpenAI Quota Exceeded. Please check your billing/plan at platform.openai.com.";
+      } else if (e.toString().contains("invalid_api_key")) {
+        errorMessage = "🔑 Invalid API Key. Please check your api_key.dart file.";
+      } else if (e.toString().contains("Connection error")) {
+        errorMessage = "🌐 Connection error. Please check your internet.";
+      }
+
       _messages.add(ChatMessage(
-        content: "Error: ${e.toString()}",
+        content: errorMessage,
         role: MessageRole.assistant,
       ));
     } finally {
